@@ -7,12 +7,25 @@ class VigenereCipher:
            offset (int): The ASCII value of the letter 'A'. A static utility attribute to help you calculate
                 a letter's position in the alphabet from 0 (A) to 25 (Z).
     """
+
+
+
     offset = ord('A')
 
     def __init__(self, keyword: str):
         self.keyword = keyword.upper()
 
+
     def __shift_letter(self, letter: str, shift: int, forward: bool):
+
+        if not forward:
+            shift = -shift
+
+        postion = ord(letter.upper()) - self.offset
+        new_pos = (postion + shift) % 26
+        return chr(new_pos + self.offset)
+
+
         """
         TO BE COMPLETED
 
@@ -59,6 +72,11 @@ class VigenereCipher:
             A list of shifts (integers).
         """
         shift_list = []
+
+        for i in range(plaintext_length):
+            key_list = self.keyword[i % len(self.keyword)]
+            shift = ord(key_list) - self.offset
+            shift_list.append(shift)
         return shift_list
 
     def encrypt(self, plaintext: str):
@@ -82,8 +100,23 @@ class VigenereCipher:
         str
             The ciphertext string.
         """
+        upper = plaintext.upper()
+        plain = ''.join(e for e in upper if e.isalpha())
+        shift = self.__generate_shift_list(len(plain))
+
+
+
         ciphertext = ''
+        for i in range(len(plain)):
+            letter = plain[i]
+            shifts = shift[i]
+            new_letter = self.__shift_letter(letter,shifts,True)
+            ciphertext = ciphertext + new_letter
+
         return ciphertext
+
+
+
 
     def decrypt(self, ciphertext: str):
         """
@@ -109,7 +142,19 @@ class VigenereCipher:
         str
             The plaintext string.
         """
+
+        upper = ciphertext.upper()
+        remove = ''.join(e for e in upper if e.isalpha())
+        shift = self.__generate_shift_list(len(remove))
+
         plaintext = ''
+
+        for i in range(len(remove)):
+            letter = remove[i]
+            shifts = shift[i]
+            new_letter = self.__shift_letter(letter,shifts,False)
+            plaintext = plaintext + new_letter
+
         return plaintext
 
 
